@@ -1,1 +1,70 @@
-<p>todo works!</p>
+<div class="flex flex-col">
+  <div class="flex justify-between items-center">
+    <h2 class="font-bold text-xl">Manage Tasks</h2>
+    <button class="btn btn-icon btn-rounded btn-primary" (click)="openSlidePanel()">
+      <i class="ri-add-line ri-lg"></i>
+      Add Todo
+    </button>
+  </div>
+
+  
+  <div class="mt-4 inline-flex gap-2">
+    <button (click)="onFilterByStatus('')"   class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-3 py-2 rounded dark:bg-gray-700 dark:text-gray-400 border border-gray-500" [ngClass]="{ 'bg-gray-600 text-gray-100': filterStatus === '' }">All</button>
+    <button (click)="onFilterByStatus('to-do')"  class="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-3 py-2 rounded dark:bg-gray-700 dark:text-yellow-300 border border-yellow-300"  [ngClass]="{'bg-yellow-600 text-yellow-100': filterStatus === 'to-do'}">To Do</button>
+    <button (click)="onFilterByStatus('in-progress')"  class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-3 py-2 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400" [ngClass]="{'bg-blue-600 text-blue-50': filterStatus === 'in-progress'}">In Progress</button>
+    <button (click)="onFilterByStatus('done')"  class="bg-green-100 text-green-800 text-xs font-medium me-2 px-3 py-2 rounded dark:bg-gray-700 dark:text-green-400 border border-green-400"  [ngClass]="{'bg-green-600 text-green-100': filterStatus === 'done'}">Done</button>
+  </div>
+
+  <div class="mt-5">
+    @for(item of todos; track $index){
+    <app-todo-card [type]="item.status" [todo]="item" (setTaskDone)="setDone(item)" (loadTodoForm)="onLoadTodoForm(item)"></app-todo-card>
+    }@empty {
+      <div class="p-4 text-sm text-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-gray-300" role="alert">
+        <span class="font-medium">No Tasks Found In This Section</span>
+      </div>
+    }
+  </div>
+</div>
+
+
+<app-slide-panel [headerText]="'Todo Details'" [isOpen]="isSlidePanelOpen"  (onClose)="onCloseSlidePanel()">
+    <form [formGroup]="todoForm" (ngSubmit)="onSubmit()" autocomplete="off" novalidate>
+        <div class="form-group mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" id="title" class="form-control"
+              [class]="{'invalid': todoForm.get('title')?.hasError('required') && todoForm.get('title')?.touched, 'valid':todoForm.get('title')?.valid}"
+              placeholder="Title" formControlName="title">
+            @if (todoForm.get('title')?.hasError('required') && todoForm.get('title')?.touched) {
+            <span class="form-error">Title is required.</span>
+            }
+          </div>
+          <div class="form-group mb-3">
+            <label for="Body" class="form-label">Body</label>
+      
+            <textarea name="" rows="10" class="form-control"
+              [class]="{'invalid': todoForm.get('body')?.hasError('required') && todoForm.get('Body')?.touched, 'valid':todoForm.get('Body')?.valid}"
+              placeholder="Body" formControlName="body"></textarea>
+            @if (todoForm.get('body')?.hasError('required') && todoForm.get('Body')?.touched) {
+            <span class="form-error">Body is required.</span>
+            }
+          </div>
+          <div class="form-group mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select"
+              [class]="{'invalid': todoForm.get('status')?.hasError('required') && todoForm.get('status')?.touched, 'valid':todoForm.get('status')?.valid}"
+              formControlName="status">
+              @for (item of todoStatus; track $index) {
+              <option [value]="item">{{item}}</option>
+              }
+            </select>
+            @if (todoForm.get('status')?.hasError('required') && todoForm.get('status')?.touched) {
+            <span class="form-error">status is required.</span>
+            }
+          </div>
+          <div class="flex gap-2">
+            <button type="submit" class="btn btn-success">Submit</button>
+            <button type="button" class="btn btn-secondary" (click)="onCloseSlidePanel()">Cancel</button>
+          </div>
+    </form>
+</app-slide-panel>
+
